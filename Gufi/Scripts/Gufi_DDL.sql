@@ -8,55 +8,83 @@ GO
 
 --INICIO TABELAS INDEPENDENTES
 
+--INSTITUIÇÃO
 CREATE TABLE Instituiçao(
-idInstituiçao TINYINT PRIMARY KEY IDENTITY (1,1),
-CNPJ CHAR(11) NOT NULL,
-nomeFantasia VARCHAR (20) NOT NULL,
-endereço VARCHAR (30) NOT NULL,
+idInstituiçao INT PRIMARY KEY IDENTITY (1,1),
+CNPJ CHAR(11) UNIQUE NOT NULL,
+nomeFantasia VARCHAR (100) NOT NULL,
+endereço VARCHAR (250) UNIQUE NOT NULL,
 );
+GO
 
+
+--TIPO DE EVENTO
 CREATE TABLE Categoria(
-idCategoria TINYINT PRIMARY KEY IDENTITY (1,1),
-nomeTipoEve VARCHAR (10) NOT NULL,
+idCategoria INT PRIMARY KEY IDENTITY (1,1),
+nomeTipoEve VARCHAR (50) UNIQUE NOT NULL,
 );
+GO
 
-CREATE TABLE Tipo_Usuario(
-idTipo_User TINYINT PRIMARY KEY IDENTITY (1,1),
-nomeTipoUser VARCHAR (18) NOT NULL,
+
+--TIPO DE USUARIO
+CREATE TABLE TipoUsuario(
+idTipoUser INT PRIMARY KEY IDENTITY (1,1),
+nomeTipoUser VARCHAR (30) UNIQUE NOT NULL,
 );
+GO
 
+
+--O UNIQUE SERVE PARA INDICAR QUE OS NOMES PREENCHIDOS NOS CAMPOS NÂO PODEM SE REPETIR
+
+
+--STATUS
 CREATE TABLE Situaçao(
-idSituaçao  TINYINT PRIMARY KEY IDENTITY (1,1),
-desccrição TEXT NOT NULL,
+idSituaçao  INT PRIMARY KEY IDENTITY (1,1),
+descrição TEXT NOT NULL,
 );
+GO
 
 --FIM TABELAS DEPENDENTES
+
+--____________________________________________________________________________________________________
+
 --INICIO DAS TABELAS DEPENDENTES
 
+--USUARIOS
 CREATE TABLE Usuarios(
-idUser TINYINT PRIMARY KEY IDENTITY (1,1),
-nomeUser VARCHAR (35) NOT NULL,
-email VARCHAR (22) NOT NULL,
+idUser INT PRIMARY KEY IDENTITY (1,1),
+idTipoUser INT FOREIGN KEY REFERENCES TipoUsuario(idTipoUser),
+nomeUser VARCHAR (50) NOT NULL,
+email VARCHAR (200) UNIQUE NOT NULL,
 senha VARCHAR (11) NOT NULL,
 endereço VARCHAR (30) NOT NULL,
 );
+GO
 
+--EVENTOS
 CREATE TABLE Eventos(
-idEvento SMALLINT PRIMARY KEY IDENTITY (1,1),
-idCategoria TINYINT FOREIGN KEY REFERENCES Categoria(idCategoria), 
-idInstituiçao TINYINT FOREIGN KEY REFERENCES Instituiçao(idInstituiçao),
-titulo VARCHAR (10) NOT NULL,
-acesso VARCHAR (16) NOT NULL,
+idEvento INT PRIMARY KEY IDENTITY (1,1),
+idCategoria INT FOREIGN KEY REFERENCES Categoria(idCategoria), 
+idInstituiçao INT FOREIGN KEY REFERENCES Instituiçao(idInstituiçao),
+titulo VARCHAR (100) NOT NULL,
+acesso BIT DEFAULT (1) NOT NULL,
 diaEvento DATETIME NOT NULL,
 descriçao TEXT NOT NULL,
 );
+GO
 
+--DEFAULT = PADRÃO, caso o usuario não preencha o campo com o default de configuração o mesmo ira preencher aquele capo no padr~que for configurado
+
+--No descrição eu poderia ter colocado VARCHAR (500) conferir se eu posso deixar text!
+
+--PRESENÇAS
 CREATE TABLE Presenças(
 idPresença INT PRIMARY KEY IDENTITY (1,1),
-idUser TINYINT FOREIGN KEY REFERENCES Usuarios(idUser),
-idEvento SMALLINT FOREIGN KEY REFERENCES Eventos(idEvento),
-idCategoria TINYINT FOREIGN KEY REFERENCES Categoria(idCategoria),
+idUser INT FOREIGN KEY REFERENCES Usuarios(idUser),
+idEvento INT FOREIGN KEY REFERENCES Eventos(idEvento),
+idSituaçao  INT FOREIGN KEY REFERENCES Situaçao(idSituaçao) DEFAULT (3),
 );
+GO
 
 --UTILIZEI O INT AQUI POIS NÃO SABIA SE O SISTEMA MATERIA O DADO DOS USUARIOS SALVOS PARA SEMPRE OU SE COM O TEMPO QUE O LIMITE DE REGISTROS
 --FOSSE ALCANÇADO O SISTEMA ACABARIA ARMAZENANDO OS DADOS DAS PESSOAS JA CADASTRADAS EM OUTRO LOCAL E APÓS ISSO IRIA PREENCHER NOVAMENTE SEUS 
